@@ -16,10 +16,11 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'npm'
+          # Hemos quitado la línea de 'cache: npm' porque daba error al no tener el lockfile
 
       - name: Instalar dependencias
-        run: npm ci
+        # Cambiamos 'npm ci' (estricto) por 'npm install' (flexible)
+        run: npm install
 
       - name: Ejecutar Cirujano
         run: node index.js
