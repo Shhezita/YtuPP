@@ -1,9 +1,9 @@
-name: Gladiatus Visit Bot
+name: Gladiatus Surgeon Bot
 
 on:
   schedule:
-    - cron: '*/5 * * * *' # Ejecutar cada 5 minutos
-  workflow_dispatch: # Permite ejecutarlo manualmente con un botón para probar
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
 
 jobs:
   visit-profile:
@@ -21,5 +21,5 @@ jobs:
       - name: Instalar dependencias
         run: npm ci
 
-      - name: Ejecutar Bot de Visita
+      - name: Ejecutar Cirujano
         run: node index.js
