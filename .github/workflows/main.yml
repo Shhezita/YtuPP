@@ -1,9 +1,13 @@
-name: Gladiatus Bot Debug
+name: Gladiatus Bot (Cache + Debug)
 
 on:
   schedule:
     - cron: '*/5 * * * *'
   workflow_dispatch:
+
+env:
+  # Definimos una ruta fija para la caché de Puppeteer
+  PUPPETEER_CACHE_DIR: ~/.cache/puppeteer
 
 jobs:
   visit-profile:
@@ -17,15 +21,27 @@ jobs:
         with:
           node-version: '18'
 
+      # --- PASO DE CACHÉ (NUEVO) ---
+      # Esto guarda el navegador descargado para no bajarlo cada vez
+      - name: Restaurar caché de Puppeteer
+        uses: actions/cache@v3
+        id: puppeteer-cache
+        with:
+          path: ~/.cache/puppeteer
+          key: ${{ runner.os }}-puppeteer-${{ hashFiles('package.json') }}
+
       - name: Instalar dependencias
+        # Si no hay caché, se descarga todo. Si hay caché, va volando.
         run: npm install
 
-      - name: Ejecutar Bot
+      - name: Ejecutar Bot (con FOTO)
         run: node index.js
 
-      # ESTE ES EL PASO NUEVO PARA VER LA FOTO
-      - name: Subir Evidencia (Screenshot)
+      # --- SUBIR LA FOTO ---
+      # Fundamental para ver si nos sale un Captcha o error
+      - name: Subir Evidencia
+        if: always() # Se ejecuta aunque el bot falle
         uses: actions/upload-artifact@v4
         with:
-          name: captura-pantalla
+          name: evidencia-visita
           path: evidence.png
