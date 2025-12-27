@@ -1,4 +1,4 @@
-name: Gladiatus Bot (Cache + Debug)
+name: Gladiatus Bot Final
 
 on:
   schedule:
@@ -6,42 +6,27 @@ on:
   workflow_dispatch:
 
 env:
-  # Definimos una ruta fija para la caché de Puppeteer
-  PUPPETEER_CACHE_DIR: ~/.cache/puppeteer
+  # Bloqueamos la descarga de Chromium para acelerar la instalación (Modo Turbo)
+  PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: 'true'
+  PUPPETEER_EXECUTABLE_PATH: '/usr/bin/google-chrome'
 
 jobs:
   visit-profile:
     runs-on: ubuntu-latest
+    timeout-minutes: 5 # Seguridad: si se traba, se mata rápido para no consumir cola
+    
     steps:
-      - name: Checkout código
+      - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Instalar Node.js
+      - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: '18'
 
-      # --- PASO DE CACHÉ (NUEVO) ---
-      # Esto guarda el navegador descargado para no bajarlo cada vez
-      - name: Restaurar caché de Puppeteer
-        uses: actions/cache@v3
-        id: puppeteer-cache
-        with:
-          path: ~/.cache/puppeteer
-          key: ${{ runner.os }}-puppeteer-${{ hashFiles('package.json') }}
-
-      - name: Instalar dependencias
-        # Si no hay caché, se descarga todo. Si hay caché, va volando.
+      - name: Install
+        # Instalación ultrarrápida (solo librerías ligeras, sin navegador)
         run: npm install
 
-      - name: Ejecutar Bot (con FOTO)
+      - name: Run
         run: node index.js
-
-      # --- SUBIR LA FOTO ---
-      # Fundamental para ver si nos sale un Captcha o error
-      - name: Subir Evidencia
-        if: always() # Se ejecuta aunque el bot falle
-        uses: actions/upload-artifact@v4
-        with:
-          name: evidencia-visita
-          path: evidence.png
