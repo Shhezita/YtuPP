@@ -1,4 +1,4 @@
-name: Gladiatus Surgeon Bot
+name: Gladiatus Bot Debug
 
 on:
   schedule:
@@ -16,11 +16,16 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          # Hemos quitado la línea de 'cache: npm' porque daba error al no tener el lockfile
 
       - name: Instalar dependencias
-        # Cambiamos 'npm ci' (estricto) por 'npm install' (flexible)
         run: npm install
 
-      - name: Ejecutar Cirujano
+      - name: Ejecutar Bot
         run: node index.js
+
+      # ESTE ES EL PASO NUEVO PARA VER LA FOTO
+      - name: Subir Evidencia (Screenshot)
+        uses: actions/upload-artifact@v4
+        with:
+          name: captura-pantalla
+          path: evidence.png
